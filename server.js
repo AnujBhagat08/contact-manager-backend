@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
   res.send("Contact Manager API is running 🚀");
 });
 
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json({ message: "This is working home route" });
 });
 
