@@ -5,51 +5,66 @@ import userRouter from "./Routes/userRoutes.js";
 import contactRouter from "./Routes/contactRoutes.js";
 import cors from "cors";
 
-dotenv.config({ quiet: true });
+dotenv.config();
 
 const app = express();
 
-// MIDDLEWARE
-app.use(express.json());
+/* CORS CONFIG (FIXED) */
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  // future:
+  // "https://contact-manager-frontend.netlify.app"
+];
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // React dev server
+    origin: (origin, callback) => {
+      // allow server-to-server / Postman
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// USER ROUTER
-app.use("/api/user", userRouter);
+// VERY IMPORTANT for preflight
+app.options("*", cors());
 
-//CONTECT ROUTER
+/* MIDDLEWARE */
+app.use(express.json());
+
+/* ROUTES */
+app.use("/api/user", userRouter);
 app.use("/api/contact", contactRouter);
 
-// Health check / root route
+/* HEALTH CHECK */
 app.get("/health", (req, res) => {
   res.send("Contact Manager API is running 🚀");
 });
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "This is working home route" });
+  res.status(200).json({ message: "Backend working fine" });
 });
 
-// DATABASE CONNECTION
+/* DATABASE */
 mongoose
   .connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log("MongoDB Connected");
-  })
-  .catch((error) => {
-    console.error("MongoDB connection failed:", error.message);
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => {
+    console.error("MongoDB error:", err.message);
     process.exit(1);
   });
 
-// SERVER
+/* SERVER */
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
