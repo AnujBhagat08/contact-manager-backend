@@ -27,6 +27,11 @@ app.use("/api/user", userRouter);
 //CONTECT ROUTER
 app.use("/api/contact", contactRouter);
 
+// Health check / root route
+app.get("/", (req, res) => {
+  res.send("Contact Manager API is running 🚀");
+});
+
 app.get("/", (req, res) => {
   res.status(200).json({ message: "This is working home route" });
 });
