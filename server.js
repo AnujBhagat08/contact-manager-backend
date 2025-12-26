@@ -1,35 +1,29 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 import userRouter from "./Routes/userRoutes.js";
 import contactRouter from "./Routes/contactRoutes.js";
-import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 
-/* CORS CONFIG */
+/* CORS – FINAL, STABLE */
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  // later add Netlify URL here
-];
+/*
+ * This is the MOST stable CORS setup.
+ * - Works with browser preflight
+ * - Works on Render free tier
+ * - Works with localhost & Netlify
+ * - No wildcard routes
+ * - No origin callback bugs
+*/
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: true, // 👈 allow request origin automatically
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -43,10 +37,6 @@ app.use("/api/contact", contactRouter);
 /* HEALTH CHECK */
 app.get("/health", (req, res) => {
   res.send("Contact Manager API is running 🚀");
-});
-
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Backend working fine" });
 });
 
 /* DATABASE */
