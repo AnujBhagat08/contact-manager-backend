@@ -9,18 +9,16 @@ dotenv.config();
 
 const app = express();
 
-/* CORS CONFIG (FIXED) */
+/* CORS CONFIG */
 
 const allowedOrigins = [
   "http://localhost:5173",
-  // future:
-  // "https://contact-manager-frontend.netlify.app"
+  // later add Netlify URL here
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow server-to-server / Postman
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -30,13 +28,10 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-// VERY IMPORTANT for preflight
-app.options("*", cors());
 
 /* MIDDLEWARE */
 app.use(express.json());
