@@ -28,11 +28,11 @@ app.use("/api/user", userRouter);
 app.use("/api/contact", contactRouter);
 
 // Health check / root route
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.send("Contact Manager API is running 🚀");
 });
 
-app.get("/health", (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({ message: "This is working home route" });
 });
 
